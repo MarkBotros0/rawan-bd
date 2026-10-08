@@ -122,9 +122,10 @@ export function SingAlong() {
   }
 
   function play() {
+    cleanup.current();
     const ctx = audio();
     const out = ctx.createGain();
-    out.gain.value = 0.9;
+    out.gain.value = 0.55; // a little softer so the voice sits on top
     out.connect(ctx.destination);
 
     const start = ctx.currentTime + 0.3;
@@ -158,6 +159,8 @@ export function SingAlong() {
     });
 
     setStage('playing');
+    // iPhones only allow speech that starts inside the tap, so line one is spoken right away.
+    speak(lineText(0));
     let raf = 0;
     let lastKey = '';
     let celebrated = false;
@@ -169,6 +172,8 @@ export function SingAlong() {
         if (key !== lastKey) {
           lastKey = key;
           setCursor({ line: current.line, word: current.word });
+          if (current.word === 0 && current.line > 0) speak(lineText(current.line));
+          if (current.line === 2 && current.word === 5 && !voice.current) speak(content.nickname, 1.5);
           if (current.line === 2 && current.word === 5 && !celebrated) {
             celebrated = true;
             burst({ x: 0.5, y: 0.55 });
@@ -185,6 +190,7 @@ export function SingAlong() {
     cleanup.current = () => {
       cancelAnimationFrame(raf);
       void out.disconnect();
+      window.speechSynthesis?.cancel();
     };
   }
 
@@ -256,6 +262,29 @@ export function SingAlong() {
       )}
     </div>
   );
+}
+
+/** One lyric line as words, minus the name (that's her recording or its own shout-out). */
+function lineText(li: number) {
+  return LINES[li]
+    .filter((n) => n.word)
+    .map((n) => n.word + (MID_WORD.has(n.word) ? '' : ' '))
+    .join('')
+    .trim();
+}
+
+/** The phone's built-in text-to-speech voice, pitched up to sound a bit more cheerful. */
+function speak(text: string, pitch = 1.3) {
+  const synth = window.speechSynthesis;
+  if (!synth) return;
+  const u = new SpeechSynthesisUtterance(text);
+  const english = synth.getVoices().find((v) => v.lang.startsWith('en'));
+  if (english) u.voice = english;
+  u.lang = 'en-US';
+  u.rate = 0.95;
+  u.pitch = pitch;
+  u.volume = 1;
+  synth.speak(u);
 }
 
 /** A plucked music-box note: a bright sine with a quick attack and a long ring. */
