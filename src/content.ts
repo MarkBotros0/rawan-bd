@@ -33,6 +33,8 @@ export const content = {
     { art: 'internet', photo: '/evidence/internet.webp', label: 'Exhibit B', caption: 'The internet. Last Monday. Shared without a second thought.', item: 'Internet, Monday', price: 'FREE', stamp: 'LIFESAVER' },
     { art: 'sandwich', photo: '/evidence/sandwich.webp', label: 'Exhibit C', caption: 'The tuna sandwich. Offered. Generously.', item: 'Tuna sandwich (offered)', price: 'FREE', stamp: 'GENEROUS' },
     { art: 'mentos', photo: '/evidence/mentos.webp', label: 'Exhibit D', caption: 'Her Mentos. Left in my car. Safe, sealed, waiting for her.', item: 'Mentos, kept safe', price: 'ON HOLD', stamp: 'SAFE & SOUND' },
+    // No receipt line for the mug: it's the IOU at the bottom of the receipt.
+    { art: 'mug', photo: '/evidence/mug.webp', label: 'Exhibit E', caption: 'Her one-of-a-kind mug. A classic. A worthy successor is coming. One day.', item: '', price: '', stamp: 'UPGRADE PENDING' },
   ],
 
   /** A promise printed at the bottom of the receipt. */

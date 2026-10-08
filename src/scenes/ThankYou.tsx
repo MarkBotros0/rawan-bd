@@ -28,7 +28,7 @@ export function ThankYou({ onDone }: SceneProps) {
           <p className="r-head">RAWAN&apos;S DESK</p>
           <p className="r-meta">Open every day · Kindness included</p>
           <hr />
-          {items.map((t) => (
+          {items.filter((t) => t.item).map((t) => (
             <div className="r-row" role="row" key={t.item}>
               <span role="cell">1× {t.item}</span>
               <span role="cell">{t.price}</span>
