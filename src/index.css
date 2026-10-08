@@ -264,6 +264,33 @@ button:focus-visible, canvas:focus-visible { outline: 3px dashed var(--gold); ou
 .cake-text { font: 400 2.6rem/1 var(--display); color: var(--cream); -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 3px 3px 0 var(--ink); }
 .plate { width: 340px; max-width: 108%; height: 18px; margin-top: -4px; border: var(--outline); border-radius: 50%; background: var(--cream); box-shadow: 0 8px 0 rgba(0,0,0,.25); }
 
+/* sing-along */
+.sing {
+  width: min(360px, 100%);
+  padding: 16px 16px 14px;
+  border: 3px dashed rgba(255,244,226,.3);
+  border-radius: 22px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  animation: scene-in .5s var(--pop) both;
+}
+.sing-lead { margin: 0; font: 400 1.45rem/1.15 var(--display); color: var(--mint); }
+.sing-sub { margin: 0; color: var(--muted); font-size: .98rem; }
+.sing-sub.small { font-size: .85rem; opacity: .85; }
+.sing-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 14px; }
+.link {
+  min-height: 44px; padding: 6px 4px; border: 0; background: none;
+  color: var(--peach); font-weight: 800; text-decoration: underline; text-underline-offset: 4px;
+}
+.meter { width: 220px; height: 14px; border: 2px solid var(--cream); border-radius: 99px; overflow: hidden; }
+.meter span { display: block; height: 100%; background: linear-gradient(90deg, var(--mint), var(--gold), var(--pink)); transform-origin: left; transition: transform .06s linear; }
+.lyrics { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.lyrics p { margin: 0; font: 800 1.08rem/1.35 var(--body); color: rgba(255,244,226,.35); transition: transform .2s var(--pop); }
+.lyrics p.on { transform: scale(1.08); }
+.lyrics span { transition: color .15s ease; }
+.lyrics span.lit { color: var(--cream); }
+.lyrics span.name { font: 400 1.5rem/1 var(--display); }
+.lyrics span.name.lit { color: var(--gold); text-shadow: 2px 2px 0 var(--ink), 0 0 18px rgba(255,196,107,.7); }
+
 /* ── 3 · balloons ────────────────────────────────── */
 .counter {
   padding: 4px 18px;

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { celebrate } from '../confetti';
 import { content } from '../content';
+import { SingAlong } from './SingAlong';
 import type { SceneProps } from './types';
 
 /** Mic loudness (RMS, 0..1) that counts as blowing. */
@@ -114,9 +115,12 @@ export function Cake({ onDone }: SceneProps) {
       </div>
 
       {done ? (
-        <button type="button" className="cta" onClick={onDone}>
-          Next surprise
-        </button>
+        <>
+          <SingAlong />
+          <button type="button" className="ghost" onClick={onDone}>
+            Next surprise
+          </button>
+        </>
       ) : (
         mic !== 'on' && (
           <button type="button" className="ghost" onClick={startMic} disabled={mic === 'asking'}>

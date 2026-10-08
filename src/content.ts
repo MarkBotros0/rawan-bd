@@ -5,6 +5,8 @@
  */
 export const content = {
   name: 'Rawan',
+  /** What her friends call her. Used in the letter and the birthday song. */
+  nickname: 'Lilo',
   age: 25,
   from: 'Mark',
 
