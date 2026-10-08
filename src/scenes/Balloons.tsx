@@ -94,12 +94,16 @@ export function Balloons({ onDone }: SceneProps) {
             onAnimationEnd={() => setPops((ps) => ps.filter((x) => x.id !== p.id))}
           >
             {p.word}
+            {content.balloonNotes[p.word] && <small className="note">{content.balloonNotes[p.word]}</small>}
           </span>
         ))}
         {done && (
           <ul className="word-cloud">
             {content.balloonWords.map((w, i) => (
-              <li key={w} style={{ ['--i' as string]: i }}>{w}</li>
+              <li key={w} style={{ ['--i' as string]: i }}>
+                {w}
+                {content.balloonNotes[w] && <small className="note">{content.balloonNotes[w]}</small>}
+              </li>
             ))}
           </ul>
         )}

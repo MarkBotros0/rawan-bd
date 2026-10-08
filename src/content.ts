@@ -20,6 +20,11 @@ export const content = {
     'problem solver', 'sandwich sharer', 'legendary', 'irreplaceable', 'Rawan',
   ],
 
+  /** Extra lines for specific balloon words, shown under the word when it pops. */
+  balloonNotes: {
+    'T# master': '(a language only she speaks)',
+  } as Record<string, string>,
+
   /** Hidden under the gold scratch card. */
   scratchSecret: 'Good for one bag of gummy bears,\non Mark.',
 
