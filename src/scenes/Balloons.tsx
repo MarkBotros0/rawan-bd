@@ -61,7 +61,7 @@ export function Balloons({ onDone }: SceneProps) {
     <section className="scene balloon-scene">
       <h2 className="title">{done ? '25 for 25' : 'Pop 25 balloons'}</h2>
       <p className="sub">
-        {done ? 'One word for every year. All of them true.' : 'Each one is hiding a word about you.'}
+        {done ? 'One word for every year. All of them true, ask anyone at work.' : 'Each one is hiding a word about you.'}
       </p>
       <div className="counter" aria-live="polite">
         <b>{Math.min(popped, GOAL)}</b> / {GOAL}
