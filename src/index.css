@@ -22,11 +22,11 @@
 }
 
 * { box-sizing: border-box; }
-html, body, #root { height: 100%; }
+html { background: var(--night); }
+html, body, #root { min-height: 100%; }
 body {
   margin: 0;
-  background: radial-gradient(120% 80% at 50% 0%, var(--night-2), var(--night) 60%);
-  background-color: var(--night);
+  background: var(--night);
   color: var(--cream);
   font: 600 17px/1.5 var(--body);
   -webkit-tap-highlight-color: transparent;
@@ -45,7 +45,11 @@ button:focus-visible, canvas:focus-visible { outline: 3px dashed var(--gold); ou
 }
 
 /* ── sky ─────────────────────────────────────────── */
-.sky { position: fixed; inset: 0; pointer-events: none; }
+.sky {
+  position: fixed; inset: 0; pointer-events: none;
+  /* The glow lives on this fixed layer so it never repeats or ends when the page scrolls. */
+  background: radial-gradient(120% 80% at 50% 0%, var(--night-2), var(--night) 60%);
+}
 .sky i { position: absolute; border-radius: 50%; background: var(--cream); animation: twinkle 3.2s ease-in-out infinite; }
 @keyframes twinkle { 0%, 100% { opacity: .15; } 50% { opacity: .9; } }
 
@@ -267,13 +271,18 @@ button:focus-visible, canvas:focus-visible { outline: 3px dashed var(--gold); ou
 .cake-text { font: 400 2.6rem/1 var(--display); color: var(--cream); -webkit-text-stroke: 2px var(--ink); paint-order: stroke fill; text-shadow: 3px 3px 0 var(--ink); }
 .plate { width: 340px; max-width: 108%; height: 18px; margin-top: -4px; border: var(--outline); border-radius: 50%; background: var(--cream); box-shadow: 0 8px 0 rgba(0,0,0,.25); }
 
+/* once the wish is made the cake steps back so the song fits on screen */
+.cake { transition: zoom .5s ease; }
+.cake.small { zoom: .62; margin-top: -6px; }
+.cake-scene.wished { gap: 12px; justify-content: flex-start; }
+
 /* sing-along */
 .sing {
   width: min(360px, 100%);
-  padding: 16px 16px 14px;
+  padding: 12px 14px 8px;
   border: 3px dashed rgba(255,244,226,.3);
   border-radius: 22px;
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
   animation: scene-in .5s var(--pop) both;
 }
 .sing-lead { margin: 0; font: 400 1.45rem/1.15 var(--display); color: var(--mint); }

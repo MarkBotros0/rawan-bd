@@ -91,7 +91,7 @@ export function Cake({ onDone }: SceneProps) {
   }, [done]);
 
   return (
-    <section className="scene cake-scene">
+    <section className={`scene cake-scene ${done ? 'wished' : ''}`}>
       <h2 className="title">{done ? 'Wish made.' : 'Make a wish'}</h2>
       <p className="sub">
         {done
@@ -101,7 +101,7 @@ export function Cake({ onDone }: SceneProps) {
             : `${remaining} candles. Blow them out, or swipe across them.`}
       </p>
 
-      <div className={`cake ${blowing && !done ? 'windy' : ''}`}>
+      <div className={`cake ${blowing && !done ? 'windy' : ''} ${done ? 'small' : ''}`}>
         <div
           className="candles"
           onPointerDown={(e) => {
