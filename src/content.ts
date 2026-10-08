@@ -14,7 +14,7 @@ export const content = {
   /** One word pops out of each of the 25 balloons, one per year. */
   balloonWords: [
     'brilliant', 'kind', 'reliable', 'hilarious', 'sharp',
-    'calm under pressure', 'creative', 'generous', 'gum supplier', 'curious',
+    'calm under pressure', 'creative', 'generous', 'gum supplier', 'T# master',
     'positive', 'thoughtful', 'supportive', 'fearless', 'detail-obsessed',
     'Wi-Fi hero', 'inspiring', 'genuine', 'quick-witted', 'team player',
     'problem solver', 'sandwich sharer', 'legendary', 'irreplaceable', 'Rawan',
