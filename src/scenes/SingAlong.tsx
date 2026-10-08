@@ -157,69 +157,93 @@ export function SingAlong() {
     const out = ctx.createGain();
     out.gain.value = 0.55; // a little softer so the voice sits on top
     out.connect(ctx.destination);
+    const clip = voice.current;
 
-    const start = ctx.currentTime + 0.3;
-    let t = start;
-    const marks: { at: number; line: number; word: number }[] = [];
-
+    // The song as a timeline in seconds. It runs on the wall clock, not the
+    // audio clock: some iPhones pause the audio engine while the speech voice
+    // talks, and the song must keep going (and look alive) when that happens.
+    type Cue = { at: number; line: number; word: number; f: number; len: number; kind: 'note' | 'voice' };
+    const cues: Cue[] = [];
+    let t = 0;
     LINES.forEach((line, li) => {
       line.forEach((n, wi) => {
         const isName = li === 2 && wi >= 5;
-        if (isName && voice.current) {
+        if (isName && clip) {
           if (wi === 5) {
-            // Her voice, with a soft chord underneath so it still sounds like the song.
-            const v = ctx.createBufferSource();
-            v.buffer = voice.current;
-            const comp = ctx.createDynamicsCompressor();
-            comp.threshold.value = -24;
-            comp.ratio.value = 6;
-            const vg = ctx.createGain();
-            vg.gain.value = 1.8;
-            // Straight to the speakers, not through the softer music bus.
-            v.connect(comp).connect(vg).connect(ctx.destination);
-            v.start(t + 0.05);
-            const span = Math.max(3 * BEAT, voice.current.duration + 0.35);
-            pad(ctx, out, [B4 / 2, D5 / 2, G4], t, span);
-            marks.push({ at: t, line: li, word: wi });
+            const span = Math.max(3 * BEAT, clip.duration + 0.35);
+            cues.push({ at: t, line: li, word: wi, f: n.f, len: span, kind: 'voice' });
             t += span;
           }
           return;
         }
-        musicBox(ctx, out, n.f, t, n.beats * BEAT);
-        marks.push({ at: t, line: li, word: wi });
+        cues.push({ at: t, line: li, word: wi, f: n.f, len: n.beats * BEAT, kind: 'note' });
         t += n.beats * BEAT;
       });
       t += BEAT * 0.15;
     });
+    const total = t;
+
+    function fire(c: Cue) {
+      const at = ctx.currentTime + 0.01;
+      if (c.kind === 'note') {
+        musicBox(ctx, out, c.f, at, c.len);
+        return;
+      }
+      // Her voice, with a soft chord underneath so it still sounds like the song.
+      const v = ctx.createBufferSource();
+      v.buffer = clip;
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -24;
+      comp.ratio.value = 6;
+      const vg = ctx.createGain();
+      vg.gain.value = 1.8;
+      // Straight to the speakers, not through the softer music bus.
+      v.connect(comp).connect(vg).connect(ctx.destination);
+      v.start(at + 0.05);
+      pad(ctx, out, [B4 / 2, D5 / 2, G4], at, c.len);
+    }
 
     setStage('playing');
     // iPhones only allow speech that starts inside the tap, so the first syllable goes right away.
+    let robot = true;
     sing(LINES[0][0].word, LINES[0][0].f);
+
+    const t0 = performance.now() / 1000 + 0.3;
+    let next = 0;
     let raf = 0;
-    let lastKey = '';
-    let celebrated = false;
+    let stalledSince = 0;
     const tick = () => {
-      const now = ctx.currentTime;
-      const current = [...marks].reverse().find((m) => m.at <= now);
-      if (current) {
-        const key = `${current.line}-${current.word}`;
-        if (key !== lastKey) {
-          lastKey = key;
-          setCursor({ line: current.line, word: current.word });
-          const note = LINES[current.line][current.word];
-          const isName = current.line === 2 && current.word >= 5;
-          if (isName) {
-            if (!voice.current && current.word === 5) sing(content.nickname, note.f, 0.9);
-          } else if (current.line + current.word > 0) {
-            sing(note.word, note.f);
-          }
-          if (current.line === 2 && current.word === 5 && !celebrated) {
-            celebrated = true;
-            burst({ x: 0.5, y: 0.55 });
-          }
+      const now = performance.now() / 1000 - t0;
+
+      // If the phone paused the audio engine, wake it. If the robot voice keeps
+      // causing that, let it go quiet so the music and her voice carry on.
+      if (ctx.state !== 'running') {
+        void ctx.resume();
+        if (!stalledSince) stalledSince = now;
+        if (robot && now - stalledSince > 0.35) {
+          robot = false;
+          window.speechSynthesis?.cancel();
+        }
+      } else {
+        stalledSince = 0;
+      }
+
+      while (next < cues.length && cues[next].at <= now) {
+        const c = cues[next++];
+        // Cues that came due while the engine was paused are shown but not
+        // played, so the music doesn't pile up when it comes back.
+        if (now - c.at < 0.25) fire(c);
+        setCursor({ line: c.line, word: c.word });
+        const isName = c.line === 2 && c.word >= 5;
+        if (isName) {
+          if (c.word === 5) burst({ x: 0.5, y: 0.55 });
+          if (robot && !clip && c.word === 5) sing(content.nickname, c.f, 0.9);
+        } else if (robot && c.line + c.word > 0) {
+          sing(LINES[c.line][c.word].word, c.f);
         }
       }
-      if (now < t + 0.6) raf = requestAnimationFrame(tick);
+
+      if (now < total + 0.6) raf = requestAnimationFrame(tick);
       else {
         setStage('done');
         setCursor(null);
