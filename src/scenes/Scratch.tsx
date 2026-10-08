@@ -81,8 +81,8 @@ export function Scratch({ onDone }: SceneProps) {
 
   return (
     <section className="scene scratch-scene">
-      <h2 className="title">{revealed ? 'Told you.' : 'One more secret'}</h2>
-      <p className="sub">{revealed ? 'Screenshot this. Show it to your manager.' : 'Scratch the gold with your finger.'}</p>
+      <h2 className="title">{revealed ? 'A coffee voucher!' : 'One more secret'}</h2>
+      <p className="sub">{revealed ? 'Screenshot it and cash it in any day. Your mug, my treat.' : 'Scratch the gold with your finger.'}</p>
 
       <div className={`ticket ${revealed ? 'revealed' : ''}`}>
         <div className="secret">

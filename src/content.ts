@@ -21,7 +21,7 @@ export const content = {
   ],
 
   /** Hidden under the gold scratch card. */
-  scratchSecret: 'One meeting that could have been an email:\nofficially cancelled.',
+  scratchSecret: 'Good for one coffee,\non Mark.',
 
   /**
    * The thank-you scene: one polaroid per kind thing she did, then a receipt.
