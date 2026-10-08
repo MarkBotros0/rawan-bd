@@ -11,7 +11,11 @@ import { content } from '../content';
  */
 
 const BEAT = 0.42; // seconds per beat (3/4 time)
-const RECORD_MS = 2500;
+const MAX_RECORD_MS = 4000;
+/** Once she has spoken, this much quiet means she's finished. */
+const TRAILING_QUIET_MS = 900;
+/** Peak mic level that counts as speaking. */
+const SPEAKING_LEVEL = 0.08;
 
 type Note = { f: number; beats: number; word: string };
 const G4 = 392, A4 = 440, B4 = 493.88, C5 = 523.25, D5 = 587.33, E5 = 659.25, F5 = 698.46, G5 = 783.99;
@@ -46,6 +50,8 @@ export function SingAlong() {
   const [stage, setStage] = useState<Stage>('intro');
   const [error, setError] = useState('');
   const [level, setLevel] = useState(0);
+  const [live, setLive] = useState(false);
+  const stopRec = useRef<() => void>(() => {});
   const [cursor, setCursor] = useState<{ line: number; word: number } | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
   const voice = useRef<AudioBuffer | null>(null);
@@ -79,14 +85,21 @@ export function SingAlong() {
     ctx.createMediaStreamSource(stream).connect(analyser);
     const buf = new Float32Array(analyser.fftSize);
     let raf = 0;
-    const meter = () => {
+    let spoke = false;
+    let lastLoud = 0;
+    const meter = (now: number) => {
       analyser.getFloatTimeDomainData(buf);
       let peak = 0;
       for (const v of buf) peak = Math.max(peak, Math.abs(v));
       setLevel(Math.min(1, peak * 2.5));
+      if (peak > SPEAKING_LEVEL) {
+        spoke = true;
+        lastLoud = now;
+      } else if (spoke && now - lastLoud > TRAILING_QUIET_MS) {
+        stopRec.current();
+      }
       raf = requestAnimationFrame(meter);
     };
-    raf = requestAnimationFrame(meter);
 
     const chunks: Blob[] = [];
     const rec = new MediaRecorder(stream);
@@ -97,6 +110,7 @@ export function SingAlong() {
     };
     cleanup.current = stopAll;
     rec.onstop = async () => {
+      setLive(false);
       stopAll();
       audioSession('playback');
       setLevel(0);
@@ -111,8 +125,17 @@ export function SingAlong() {
       }
       setStage('ready');
     };
+    stopRec.current = () => {
+      if (rec.state === 'recording') rec.stop();
+    };
+    // Only ask her to speak once Safari is really recording, so the start isn't lost.
+    rec.onstart = () => {
+      setLive(true);
+      raf = requestAnimationFrame(meter);
+      setTimeout(() => stopRec.current(), MAX_RECORD_MS);
+    };
+    setLive(false);
     rec.start();
-    setTimeout(() => rec.state === 'recording' && rec.stop(), RECORD_MS);
   }
 
   function preview() {
@@ -227,11 +250,14 @@ export function SingAlong() {
 
       {stage === 'recording' && (
         <>
-          <p className="sing-lead">Say “{content.nickname}”!</p>
+          <p className="sing-lead">{live ? `Say “${content.nickname}” now!` : 'Getting the mic ready…'}</p>
           <div className="meter" aria-hidden="true">
             <span style={{ transform: `scaleX(${Math.max(0.04, level)})` }} />
           </div>
-          <p className="sing-sub">Listening…</p>
+          <p className="sing-sub">{live ? 'I stop listening when you finish.' : ' '}</p>
+          {live && (
+            <button type="button" className="link" onClick={() => stopRec.current()}>Done</button>
+          )}
         </>
       )}
 
@@ -347,10 +373,19 @@ function pad(ctx: AudioContext, out: AudioNode, freqs: number[], at: number, len
 function trimSilence(ctx: AudioContext, buf: AudioBuffer): AudioBuffer | null {
   const data = buf.getChannelData(0);
   const win = Math.floor(buf.sampleRate * 0.02);
+  // Quiet relative to how loud she was, so a soft ending like "-lo" is kept.
+  let loudest = 0;
+  for (let i = 0; i < data.length; i += win) {
+    let sum = 0;
+    for (let j = i; j < Math.min(i + win, data.length); j++) sum += data[j] * data[j];
+    loudest = Math.max(loudest, Math.sqrt(sum / win));
+  }
+  if (loudest < 0.004) return null;
+  const threshold = Math.max(0.003, loudest * 0.08);
   const loud = (i: number) => {
     let sum = 0;
     for (let j = i; j < Math.min(i + win, data.length); j++) sum += data[j] * data[j];
-    return Math.sqrt(sum / win) > 0.02;
+    return Math.sqrt(sum / win) > threshold;
   };
   let first = -1;
   let last = -1;
@@ -361,15 +396,20 @@ function trimSilence(ctx: AudioContext, buf: AudioBuffer): AudioBuffer | null {
     }
   }
   if (first < 0) return null;
-  const pad = Math.floor(buf.sampleRate * 0.06);
-  const from = Math.max(0, first - pad);
-  const to = Math.min(data.length, last + pad);
+  const from = Math.max(0, first - Math.floor(buf.sampleRate * 0.12));
+  const to = Math.min(data.length, last + Math.floor(buf.sampleRate * 0.3));
   const clip = data.slice(from, to);
   // Phone mics record quietly; scale so the loudest moment is near full volume.
   let peak = 0;
   for (const v of clip) peak = Math.max(peak, Math.abs(v));
   const boost = Math.min(12, 0.95 / Math.max(peak, 1e-4));
   for (let i = 0; i < clip.length; i++) clip[i] *= boost;
+  // Short fades so the cut edges don't click.
+  const fade = Math.min(Math.floor(buf.sampleRate * 0.02), clip.length >> 2);
+  for (let i = 0; i < fade; i++) {
+    clip[i] *= i / fade;
+    clip[clip.length - 1 - i] *= i / fade;
+  }
   const out = ctx.createBuffer(1, clip.length, buf.sampleRate);
   out.copyToChannel(clip, 0);
   return out;
