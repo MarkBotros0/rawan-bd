@@ -40,6 +40,9 @@ export const content = {
   /** A promise printed at the bottom of the receipt. */
   iou: { item: 'New mug', when: 'ONE DAY' },
 
+  /** Taped to the bottom of the letter, under the signature. */
+  letterPhoto: { src: '/evidence/us.webp', caption: 'Proof that work can be fun.' },
+
   /** The closing letter, typed out one paragraph at a time. */
   letter: [
     'Happy birthday, Lilo!',

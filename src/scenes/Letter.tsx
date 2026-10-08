@@ -63,6 +63,12 @@ export function Letter({ onRestart }: SceneProps) {
           ) : null,
         )}
         {finished && <p className="sign">— {content.from}</p>}
+        {finished && (
+          <figure className="taped">
+            <img src={content.letterPhoto.src} alt={`${content.name} and ${content.from} smiling at work`} />
+            <figcaption>{content.letterPhoto.caption}</figcaption>
+          </figure>
+        )}
       </article>
 
       {finished ? (

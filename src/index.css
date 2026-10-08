@@ -510,6 +510,25 @@ button:focus-visible, canvas:focus-visible { outline: 3px dashed var(--gold); ou
 .paper p { margin: 0 0 34px; }
 .paper p:last-of-type { margin-bottom: 0; }
 .paper .sign { margin: 10px 0 0; text-align: right; font-weight: 700; font-size: 1.8rem; }
+.taped {
+  position: relative;
+  width: min(250px, 82%);
+  margin: 26px auto 6px;
+  padding: 10px 10px 8px;
+  background: #fff;
+  border: 2px solid var(--ink);
+  box-shadow: 5px 5px 0 rgba(28,11,33,.25);
+  rotate: 3deg;
+  animation: drop-in .6s var(--pop) both;
+}
+.taped::before, .taped::after {
+  content: ''; position: absolute; top: -12px; width: 70px; height: 22px;
+  background: rgba(255,196,107,.75); border: 1px solid rgba(28,11,33,.15);
+}
+.taped::before { left: -18px; rotate: -32deg; }
+.taped::after { right: -18px; rotate: 32deg; }
+.taped img { display: block; width: 100%; aspect-ratio: 720 / 860; object-fit: cover; }
+.taped figcaption { margin-top: 6px; text-align: center; font: 700 1.35rem/1.1 var(--hand); }
 .caret { display: inline-block; width: 2px; height: 1.1em; margin-left: 2px; vertical-align: -3px; background: #2a1a2e; animation: blink .8s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 .finale { display: flex; flex-direction: column; align-items: center; gap: 14px; }
