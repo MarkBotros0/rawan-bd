@@ -117,7 +117,9 @@ export function SingAlong() {
     if (!voice.current) return;
     const src = ctx.createBufferSource();
     src.buffer = voice.current;
-    src.connect(ctx.destination);
+    const g = ctx.createGain();
+    g.gain.value = 1.8;
+    src.connect(g).connect(ctx.destination);
     src.start();
   }
 
@@ -140,9 +142,13 @@ export function SingAlong() {
             // Her voice, with a soft chord underneath so it still sounds like the song.
             const v = ctx.createBufferSource();
             v.buffer = voice.current;
+            const comp = ctx.createDynamicsCompressor();
+            comp.threshold.value = -24;
+            comp.ratio.value = 6;
             const vg = ctx.createGain();
-            vg.gain.value = 1.6;
-            v.connect(vg).connect(out);
+            vg.gain.value = 1.8;
+            // Straight to the speakers, not through the softer music bus.
+            v.connect(comp).connect(vg).connect(ctx.destination);
             v.start(t + 0.05);
             const span = Math.max(3 * BEAT, voice.current.duration + 0.35);
             pad(ctx, out, [B4 / 2, D5 / 2, G4], t, span);
@@ -159,8 +165,8 @@ export function SingAlong() {
     });
 
     setStage('playing');
-    // iPhones only allow speech that starts inside the tap, so line one is spoken right away.
-    speak(lineText(0));
+    // iPhones only allow speech that starts inside the tap, so the first syllable goes right away.
+    sing(LINES[0][0].word, LINES[0][0].f);
     let raf = 0;
     let lastKey = '';
     let celebrated = false;
@@ -172,8 +178,13 @@ export function SingAlong() {
         if (key !== lastKey) {
           lastKey = key;
           setCursor({ line: current.line, word: current.word });
-          if (current.word === 0 && current.line > 0) speak(lineText(current.line));
-          if (current.line === 2 && current.word === 5 && !voice.current) speak(content.nickname, 1.5);
+          const note = LINES[current.line][current.word];
+          const isName = current.line === 2 && current.word >= 5;
+          if (isName) {
+            if (!voice.current && current.word === 5) sing(content.nickname, note.f, 0.9);
+          } else if (current.line + current.word > 0) {
+            sing(note.word, note.f);
+          }
           if (current.line === 2 && current.word === 5 && !celebrated) {
             celebrated = true;
             burst({ x: 0.5, y: 0.55 });
@@ -264,25 +275,23 @@ export function SingAlong() {
   );
 }
 
-/** One lyric line as words, minus the name (that's her recording or its own shout-out). */
-function lineText(li: number) {
-  return LINES[li]
-    .filter((n) => n.word)
-    .map((n) => n.word + (MID_WORD.has(n.word) ? '' : ' '))
-    .join('')
-    .trim();
-}
-
-/** The phone's built-in text-to-speech voice, pitched up to sound a bit more cheerful. */
-function speak(text: string, pitch = 1.3) {
+/**
+ * "Sing" one syllable with the phone's text-to-speech voice. Speech voices
+ * can't hold a note, but their pitch can follow the melody: G4..G5 maps onto
+ * the voice's 0.6..2 pitch range. Anything still talking is cut off so the
+ * voice stays on the beat.
+ */
+function sing(syllable: string, freq: number, rate = 1.25) {
   const synth = window.speechSynthesis;
-  if (!synth) return;
-  const u = new SpeechSynthesisUtterance(text);
+  if (!synth || !syllable) return;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(syllable.replace(/[,!]/g, ''));
   const english = synth.getVoices().find((v) => v.lang.startsWith('en'));
   if (english) u.voice = english;
   u.lang = 'en-US';
-  u.rate = 0.95;
-  u.pitch = pitch;
+  const octave = Math.log2(freq / G4); // 0 at G4, 1 at G5
+  u.pitch = Math.min(2, 0.6 + octave * 1.4);
+  u.rate = rate;
   u.volume = 1;
   synth.speak(u);
 }
@@ -345,8 +354,14 @@ function trimSilence(ctx: AudioContext, buf: AudioBuffer): AudioBuffer | null {
   const pad = Math.floor(buf.sampleRate * 0.06);
   const from = Math.max(0, first - pad);
   const to = Math.min(data.length, last + pad);
-  const out = ctx.createBuffer(1, to - from, buf.sampleRate);
-  out.copyToChannel(data.slice(from, to), 0);
+  const clip = data.slice(from, to);
+  // Phone mics record quietly; scale so the loudest moment is near full volume.
+  let peak = 0;
+  for (const v of clip) peak = Math.max(peak, Math.abs(v));
+  const boost = Math.min(12, 0.95 / Math.max(peak, 1e-4));
+  for (let i = 0; i < clip.length; i++) clip[i] *= boost;
+  const out = ctx.createBuffer(1, clip.length, buf.sampleRate);
+  out.copyToChannel(clip, 0);
   return out;
 }
 
