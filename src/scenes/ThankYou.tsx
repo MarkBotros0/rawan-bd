@@ -4,7 +4,8 @@ import { burst, mentosRain } from '../confetti';
 import { content } from '../content';
 import type { SceneProps } from './types';
 
-const items = content.thankYous;
+type Exhibit = { art: string; photo: string; label: string; caption: string; item: string; price: string; stamp: string };
+const items: readonly Exhibit[] = content.thankYous;
 
 export function ThankYou({ onDone }: SceneProps) {
   const [shown, setShown] = useState(0);

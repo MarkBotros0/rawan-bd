@@ -29,10 +29,10 @@ export const content = {
    * public/evidence/ and set `photo: '/evidence/<file>'`.
    */
   thankYous: [
-    { art: 'gum', photo: '', label: 'Exhibit A', caption: 'The gum. Today. No questions asked.', item: 'Bubblegum, sugar-free', price: 'FREE', stamp: 'VERY KIND' },
-    { art: 'internet', photo: '', label: 'Exhibit B', caption: 'The internet. Last Monday. Shared without a second thought.', item: 'Internet, Monday', price: 'FREE', stamp: 'LIFESAVER' },
-    { art: 'sandwich', photo: '', label: 'Exhibit C', caption: 'The tuna sandwich. Offered. Generously.', item: 'Tuna sandwich (offered)', price: 'FREE', stamp: 'GENEROUS' },
-    { art: 'mentos', photo: '', label: 'Exhibit D', caption: 'Her Mentos. Left in my car. Safe, sealed, waiting for her.', item: 'Mentos, kept safe', price: 'ON HOLD', stamp: 'SAFE & SOUND' },
+    { art: 'gum', photo: '/evidence/gum.webp', label: 'Exhibit A', caption: 'The gum. Today. No questions asked.', item: 'Bubblegum, sugar-free', price: 'FREE', stamp: 'VERY KIND' },
+    { art: 'internet', photo: '/evidence/internet.webp', label: 'Exhibit B', caption: 'The internet. Last Monday. Shared without a second thought.', item: 'Internet, Monday', price: 'FREE', stamp: 'LIFESAVER' },
+    { art: 'sandwich', photo: '/evidence/sandwich.webp', label: 'Exhibit C', caption: 'The tuna sandwich. Offered. Generously.', item: 'Tuna sandwich (offered)', price: 'FREE', stamp: 'GENEROUS' },
+    { art: 'mentos', photo: '/evidence/mentos.webp', label: 'Exhibit D', caption: 'Her Mentos. Left in my car. Safe, sealed, waiting for her.', item: 'Mentos, kept safe', price: 'ON HOLD', stamp: 'SAFE & SOUND' },
   ],
 
   /** A promise printed at the bottom of the receipt. */
