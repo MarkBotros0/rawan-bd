@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { burst } from '../confetti';
+import { gummyBurst } from '../confetti';
 import { content } from '../content';
 import type { SceneProps } from './types';
 
@@ -49,7 +49,7 @@ export function Scratch({ onDone }: SceneProps) {
   }, []);
 
   useEffect(() => {
-    if (revealed) burst({ x: 0.5, y: 0.45 });
+    if (revealed) gummyBurst();
   }, [revealed]);
 
   function point(e: React.PointerEvent<HTMLCanvasElement>) {
@@ -81,8 +81,8 @@ export function Scratch({ onDone }: SceneProps) {
 
   return (
     <section className="scene scratch-scene">
-      <h2 className="title">{revealed ? 'A coffee voucher!' : 'One more secret'}</h2>
-      <p className="sub">{revealed ? 'Screenshot it and cash it in any day. Your mug, my treat.' : 'Scratch the gold with your finger.'}</p>
+      <h2 className="title">{revealed ? 'Gummy bear voucher!' : 'One more secret'}</h2>
+      <p className="sub">{revealed ? 'Screenshot it and cash it in any day. Any flavour. Yes, even the red ones.' : 'Scratch the gold with your finger.'}</p>
 
       <div className={`ticket ${revealed ? 'revealed' : ''}`}>
         <div className="secret">

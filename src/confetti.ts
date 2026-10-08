@@ -30,3 +30,10 @@ export function mentosRain() {
     colors: ['#ffffff', '#f2f6ff', '#2f5fd0'],
   });
 }
+
+/** Chunky, translucent gummy-bear colours, for the gummy bear voucher. */
+export function gummyBurst() {
+  const colors = ['#ff3b4e', '#ff8a1f', '#ffd21f', '#4cd964', '#ffffff', '#ff5fa2'];
+  confetti({ particleCount: 60, spread: 100, startVelocity: 38, scalar: 2.2, shapes: ['circle'], origin: { x: 0.5, y: 0.45 }, colors });
+  confetti({ particleCount: 40, spread: 140, startVelocity: 28, scalar: 1.4, origin: { x: 0.5, y: 0.45 }, colors });
+}
