@@ -41,7 +41,7 @@ export function Gift({ onDone }: SceneProps) {
             {content.name}
             <span className="age">is {content.age}</span>
           </h1>
-          <p className="sub">Four little surprises inside. Ready?</p>
+          <p className="sub">Five little surprises inside. Ready?</p>
           <button type="button" className="cta" onClick={onDone}>
             Let&apos;s go
           </button>

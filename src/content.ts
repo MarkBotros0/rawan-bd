@@ -14,20 +14,37 @@ export const content = {
   /** One word pops out of each of the 25 balloons, one per year. */
   balloonWords: [
     'brilliant', 'kind', 'reliable', 'hilarious', 'sharp',
-    'calm under pressure', 'creative', 'generous', 'organized', 'curious',
+    'calm under pressure', 'creative', 'generous', 'gum supplier', 'curious',
     'positive', 'thoughtful', 'supportive', 'fearless', 'detail-obsessed',
-    'patient', 'inspiring', 'genuine', 'quick-witted', 'team player',
-    'problem solver', 'warm', 'legendary', 'irreplaceable', 'Rawan',
+    'Wi-Fi hero', 'inspiring', 'genuine', 'quick-witted', 'team player',
+    'problem solver', 'sandwich sharer', 'legendary', 'irreplaceable', 'Rawan',
   ],
 
   /** Hidden under the gold scratch card. */
   scratchSecret: 'One meeting that could have been an email:\nofficially cancelled.',
 
+  /**
+   * The thank-you scene: one polaroid per kind thing she did, then a receipt.
+   * `art` picks the drawing. To use a real photo instead, put it in
+   * public/evidence/ and set `photo: '/evidence/<file>'`.
+   */
+  thankYous: [
+    { art: 'gum', photo: '', label: 'Exhibit A', caption: 'The gum. Today. No questions asked.', item: 'Bubblegum, sugar-free', price: 'FREE', stamp: 'VERY KIND' },
+    { art: 'internet', photo: '', label: 'Exhibit B', caption: 'The internet. Last Monday. Shared without a second thought.', item: 'Internet, Monday', price: 'FREE', stamp: 'LIFESAVER' },
+    { art: 'sandwich', photo: '', label: 'Exhibit C', caption: 'The tuna sandwich. Offered. Generously.', item: 'Tuna sandwich (offered)', price: 'FREE', stamp: 'GENEROUS' },
+    { art: 'mentos', photo: '', label: 'Exhibit D', caption: 'Her Mentos. Left in my car. Safe, sealed, waiting for her.', item: 'Mentos, kept safe', price: 'ON HOLD', stamp: 'SAFE & SOUND' },
+  ],
+
+  /** A promise printed at the bottom of the receipt. */
+  iou: { item: 'New mug', when: 'ONE DAY' },
+
   /** The closing letter, typed out one paragraph at a time. */
   letter: [
     'Happy birthday, Rawan!',
     'Working with you makes the long days shorter and the hard tasks easier. You bring good energy, good ideas and the occasional much-needed laugh.',
-    'Thank you for always being so helpful and so easy to work with.',
+    'Thank you for the gum today, for sharing your internet last Monday, and for offering me your tuna sandwich. Small things, but they make work a lot nicer.',
+    'And don\'t worry, your Mentos are safe in my car. I haven\'t touched them. Much.',
+    'Also, one day I will get you a new mug. One day.',
     'I hope 25 brings you exciting projects, well-earned wins and plenty of time away from your screen.',
     'Enjoy your day. You deserve it.',
   ],

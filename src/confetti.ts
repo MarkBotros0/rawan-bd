@@ -15,3 +15,18 @@ export function celebrate(ms = 2500) {
     if (Date.now() < end) requestAnimationFrame(frame);
   })();
 }
+
+/** White and blue mints falling from the top, for the Mentos. */
+export function mentosRain() {
+  confetti({
+    particleCount: 70,
+    spread: 160,
+    startVelocity: 18,
+    gravity: 0.9,
+    scalar: 1.6,
+    ticks: 260,
+    shapes: ['circle'],
+    origin: { x: 0.5, y: -0.1 },
+    colors: ['#ffffff', '#f2f6ff', '#2f5fd0'],
+  });
+}

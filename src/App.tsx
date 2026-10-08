@@ -5,11 +5,15 @@ import { Cake } from './scenes/Cake';
 import { Gift } from './scenes/Gift';
 import { Letter } from './scenes/Letter';
 import { Scratch } from './scenes/Scratch';
+import { ThankYou } from './scenes/ThankYou';
 
-const SCENES = [Gift, Cake, Balloons, Scratch, Letter];
+const SCENES = [Gift, Cake, Balloons, Scratch, ThankYou, Letter];
 
 export default function App() {
-  const [step, setStep] = useState(0);
+  // In dev, ?scene=N jumps straight to a scene for previewing.
+  const [step, setStep] = useState(() =>
+    import.meta.env.DEV ? Number(new URLSearchParams(location.search).get('scene') ?? 0) : 0,
+  );
   const Scene = SCENES[step];
   const next = () => setStep((s) => Math.min(s + 1, SCENES.length - 1));
   const restart = () => setStep(0);

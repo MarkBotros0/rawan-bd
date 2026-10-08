@@ -112,7 +112,7 @@ export function Scratch({ onDone }: SceneProps) {
 
       {revealed ? (
         <button type="button" className="cta" onClick={onDone}>
-          Last one
+          Next surprise
         </button>
       ) : (
         <button type="button" className="ghost" onClick={() => setRevealed(true)}>
