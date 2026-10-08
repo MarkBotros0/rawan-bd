@@ -191,6 +191,9 @@ button:focus-visible, canvas:focus-visible { outline: 3px dashed var(--gold); ou
   margin-bottom: -6px;
   position: relative;
   z-index: 1;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .candle {
   position: relative;

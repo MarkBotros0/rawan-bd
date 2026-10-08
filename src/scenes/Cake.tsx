@@ -32,8 +32,18 @@ export function Cake({ onDone }: SceneProps) {
   }
 
   function snuff(i: number) {
-    setLit((prev) => prev.map((on, j) => (j === i ? false : on)));
-    navigator.vibrate?.(10);
+    setLit((prev) => {
+      if (!prev[i]) return prev;
+      navigator.vibrate?.(10);
+      return prev.map((on, j) => (j === i ? false : on));
+    });
+  }
+
+  /** Swiping a finger across the candles puts out every one it passes over. */
+  const swiping = useRef(false);
+  function swipeAt(x: number, y: number) {
+    const el = document.elementFromPoint(x, y)?.closest<HTMLElement>('[data-candle]');
+    if (el) snuff(Number(el.dataset.candle));
   }
 
   async function startMic() {
@@ -88,18 +98,29 @@ export function Cake({ onDone }: SceneProps) {
           ? "Don't tell anyone what it was."
           : mic === 'on'
             ? 'Now blow into your phone.'
-            : `${remaining} candles. Blow them out, or tap them one by one.`}
+            : `${remaining} candles. Blow them out, or swipe across them.`}
       </p>
 
       <div className={`cake ${blowing && !done ? 'windy' : ''}`}>
-        <div className="candles">
+        <div
+          className="candles"
+          onPointerDown={(e) => {
+            swiping.current = true;
+            e.currentTarget.setPointerCapture(e.pointerId);
+            swipeAt(e.clientX, e.clientY);
+          }}
+          onPointerMove={(e) => swiping.current && swipeAt(e.clientX, e.clientY)}
+          onPointerUp={() => (swiping.current = false)}
+          onPointerCancel={() => (swiping.current = false)}
+        >
           {lit.map((on, i) => (
             <button
               key={i}
+              data-candle={i}
+              onClick={() => snuff(i)}
               type="button"
               className={`candle ${on ? 'lit' : 'out'}`}
               style={{ ['--h' as string]: `${18 + ((i * 7) % 11)}px`, ['--i' as string]: i }}
-              onClick={() => on && snuff(i)}
               aria-label={on ? `Blow out candle ${i + 1}` : `Candle ${i + 1} is out`}
             >
               <span className="flame" />
