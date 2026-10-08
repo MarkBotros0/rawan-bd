@@ -42,7 +42,7 @@ export const content = {
 
   /** The closing letter, typed out one paragraph at a time. */
   letter: [
-    'Happy birthday, Rawan!',
+    'Happy birthday, Lilo!',
     'Working with you makes the long days shorter and the hard tasks easier. You bring good energy, good ideas and the occasional much-needed laugh.',
     'Thank you for the gum today, for sharing your internet last Monday, and for offering me your tuna sandwich. Small things, but they make work a lot nicer.',
     'And don\'t worry, your Mentos are safe in my car. I haven\'t touched them. Much.',
