@@ -205,36 +205,37 @@ export function SingAlong() {
 
     setStage('playing');
     // iPhones only allow speech that starts inside the tap, so the first syllable goes right away.
-    // iPhones pause the music whenever their speech voice talks, which makes the
-    // song cut out, so there the robot voice sits this one out.
-    let robot = !isIOS();
-    if (robot) sing(LINES[0][0].word, LINES[0][0].f);
+    let robot = true;
+    sing(LINES[0][0].word, LINES[0][0].f);
 
-    const t0 = performance.now() / 1000 + 0.3;
+    let t0 = performance.now() / 1000 + 0.3;
+    let lastFrame = performance.now() / 1000;
     let next = 0;
     let raf = 0;
-    let stalledSince = 0;
+    let stalled = 0;
     const tick = () => {
-      const now = performance.now() / 1000 - t0;
+      const wall = performance.now() / 1000;
+      const dt = wall - lastFrame;
+      lastFrame = wall;
 
-      // If the phone paused the audio engine, wake it. If the robot voice keeps
-      // causing that, let it go quiet so the music and her voice carry on.
+      // Some iPhones pause the audio engine while their speech voice talks.
+      // When that happens the song waits (nothing is skipped), the engine is
+      // woken up, and if the robot voice keeps causing it, the robot goes quiet
+      // on that phone so the rest of the song plays smoothly.
       if (ctx.state !== 'running') {
+        t0 += dt;
         void ctx.resume();
-        if (!stalledSince) stalledSince = now;
-        if (robot && now - stalledSince > 0.35) {
+        stalled += dt;
+        if (robot && stalled > 0.25) {
           robot = false;
           window.speechSynthesis?.cancel();
         }
-      } else {
-        stalledSince = 0;
       }
+      const now = wall - t0;
 
       while (next < cues.length && cues[next].at <= now) {
         const c = cues[next++];
-        // Cues that came due while the engine was paused are shown but not
-        // played, so the music doesn't pile up when it comes back.
-        if (now - c.at < 0.25) fire(c);
+        if (ctx.state === 'running') fire(c);
         setCursor({ line: c.line, word: c.word });
         const isName = c.line === 2 && c.word >= 5;
         if (isName) {
@@ -330,11 +331,6 @@ export function SingAlong() {
       )}
     </div>
   );
-}
-
-/** iPhone, iPad, or an iPad presenting itself as a Mac. Every iOS browser shares Safari's engine. */
-function isIOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
 /**
