@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { audioSession } from '../audioSession';
 import { celebrate } from '../confetti';
 import { content } from '../content';
 import { SingAlong } from './SingAlong';
@@ -48,6 +49,7 @@ export function Cake({ onDone }: SceneProps) {
 
   async function startMic() {
     setMic('asking');
+    audioSession('play-and-record');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const ctx = new AudioContext();
@@ -75,6 +77,7 @@ export function Cake({ onDone }: SceneProps) {
         cancelAnimationFrame(raf);
         stream.getTracks().forEach((tr) => tr.stop());
         void ctx.close();
+        audioSession('playback');
       };
       setMic('on');
     } catch {

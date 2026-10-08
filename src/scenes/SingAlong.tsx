@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { burst } from '../confetti';
+import { audioSession } from '../audioSession';
 import { content } from '../content';
 
 /**
@@ -61,6 +62,7 @@ export function SingAlong() {
 
   async function record() {
     setError('');
+    audioSession('play-and-record');
     const ctx = audio();
     let stream: MediaStream;
     try {
@@ -96,6 +98,7 @@ export function SingAlong() {
     cleanup.current = stopAll;
     rec.onstop = async () => {
       stopAll();
+      audioSession('playback');
       setLevel(0);
       try {
         const raw = await new Blob(chunks, { type: rec.mimeType }).arrayBuffer();
@@ -113,6 +116,7 @@ export function SingAlong() {
   }
 
   function preview() {
+    audioSession('playback');
     const ctx = audio();
     if (!voice.current) return;
     const src = ctx.createBufferSource();
@@ -125,6 +129,7 @@ export function SingAlong() {
 
   function play() {
     cleanup.current();
+    audioSession('playback');
     const ctx = audio();
     const out = ctx.createGain();
     out.gain.value = 0.55; // a little softer so the voice sits on top
@@ -284,7 +289,6 @@ export function SingAlong() {
 function sing(syllable: string, freq: number, rate = 1.25) {
   const synth = window.speechSynthesis;
   if (!synth || !syllable) return;
-  synth.cancel();
   const u = new SpeechSynthesisUtterance(syllable.replace(/[,!]/g, ''));
   const english = synth.getVoices().find((v) => v.lang.startsWith('en'));
   if (english) u.voice = english;
@@ -293,7 +297,13 @@ function sing(syllable: string, freq: number, rate = 1.25) {
   u.pitch = Math.min(2, 0.6 + octave * 1.4);
   u.rate = rate;
   u.volume = 1;
-  synth.speak(u);
+  if (synth.speaking || synth.pending) {
+    // Safari drops an utterance queued in the same moment as cancel(), so leave a beat.
+    synth.cancel();
+    setTimeout(() => synth.speak(u), 40);
+  } else {
+    synth.speak(u);
+  }
 }
 
 /** A plucked music-box note: a bright sine with a quick attack and a long ring. */
