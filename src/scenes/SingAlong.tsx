@@ -205,8 +205,10 @@ export function SingAlong() {
 
     setStage('playing');
     // iPhones only allow speech that starts inside the tap, so the first syllable goes right away.
-    let robot = true;
-    sing(LINES[0][0].word, LINES[0][0].f);
+    // iPhones pause the music whenever their speech voice talks, which makes the
+    // song cut out, so there the robot voice sits this one out.
+    let robot = !isIOS();
+    if (robot) sing(LINES[0][0].word, LINES[0][0].f);
 
     const t0 = performance.now() / 1000 + 0.3;
     let next = 0;
@@ -328,6 +330,11 @@ export function SingAlong() {
       )}
     </div>
   );
+}
+
+/** iPhone, iPad, or an iPad presenting itself as a Mac. Every iOS browser shares Safari's engine. */
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
 /**
